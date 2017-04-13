@@ -1,23 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title> game thing</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<style>
-
-canvas {
-    border:5px solid #d3d3d3;
-    background-color: #79aff2;
-}
-</style>
-</head>
-<body onload="startGame()">
-    
-<script>
-
 var myGamePiece;
 var myObstacles = [];
 var myScore;
+
+
 var forward = true;
 var beep = true;
 
@@ -25,6 +10,9 @@ function startGame() {
     myGamePiece = new component(15, 15, "yellow", 10, 120);
     myGamePiece.gravity = 0.55;
     myScore = new component("30px", "Consolas", "green", 280, 40, "text");
+    
+   
+    
     myGameArea.start();
 }
 
@@ -99,6 +87,9 @@ function updateGameArea() {
     var x, height, gap, minHeight, maxHeight, minGap, maxGap;
     for (i = 0; i < myObstacles.length; i += 1) {
         if (myGamePiece.crashWith(myObstacles[i])) {
+            
+            
+
             return;
         } 
     }
@@ -121,6 +112,8 @@ function updateGameArea() {
     }
     myScore.text="SCORE: " + myGameArea.frameNo;
     myScore.update();
+    
+    
     myGamePiece.newPos();
     myGamePiece.update();
     if(forward){
@@ -146,24 +139,3 @@ function everyinterval(n) {
 function accelerate(n) {
     myGamePiece.gravity = n;
 }
-</script>
-
-<br />
-<h1>One hundred percent original game.</h1>
-<button style="height:70px;width:150px" 
-onmousedown="accelerate(-0.25)" onmouseup="accelerate(0.5)" >
-WHEEEEE
-</button>
-<hr />
-<p>WHEEEEE to go up, let go to come down</p>
-<p>Yes, the controls are awful.</p>
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<p>also Brian is awesome</p>
-</body>
-</html>

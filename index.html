@@ -1,18 +1,26 @@
 <!doctype html>
 <html>
     <head>
+        <link rel="icon" href="https://www.iconexperience.com/_img/g_collection_png/standard/512x512/banana.png">
+        
         <link rel = "stylesheet" href = "styles.css"/>
         <link href="https://fonts.googleapis.com/css?family=Revalia" rel="stylesheet">
+        
+        <script src = "https://code.jquery.com/jquery-3.2.0.min.js"></script>
         <script type="text/javascript" src="script.js"></script>
+            
+        
     </head>
     
     <body>
         <br />
         <h1>One hundred percent original game.</h1>
-        <button style="height:70px;width:150px" 
+        
+        <button id = "wheeeee" style="height:70px;width:150px" 
         onmousedown="accelerate(-0.25)" onmouseup="accelerate(0.5)" >
         WHEEEEE
         </button>
+        
         <hr />
         <p>WHEEEEE to go up, let go to come down</p>
         <p>Yes, the controls are awful.</p>
@@ -29,22 +37,24 @@
         
         <img src = "data:image/jpeg;base64,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"/>
         
-        <h3 class = "coolFont">The end is near. Cease your futile efforts.</h3>
+        <h3 class = "coolFont">This font.</h3>
         
         <p class = "test-class1">Am trying</p>
         <p></p>
         <p >Very hard yes i am.</p>
         
-        <div class = "roarer">
-            <h2>Hear to roar.</h2>
-        </div>
         
+        <button id = "roarer">Hear to roar.</button>
+        
+        
+        <!--
         <audio autoplay>
             <source src = "single_roar_from_lion.mp3" type = "audio/mpeg">
         </audio>
+        -->
         
-        <marquee direction="up" width="100%" height="250" behavior="alternate" style="border:solid">
-            <marquee behavior="alternate">hi</marquee>
+        <marquee direction="up" width="50%" height="250" behavior="alternate" style="border: solid">
+            <marquee behavior="alternate">not obsolete</marquee>
         </marquee>
     </body>
     
@@ -57,151 +67,17 @@
 <html>
 <head>
 <title> game thing</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<style>
 
+<style>
 canvas {
     border:5px solid #d3d3d3;
     background-color: #79aff2;
-}
+}                       
 </style>
 </head>
 <body onload="startGame()">
-    
-<script>
+    <script type="text/javascript" src="annoyingGame.js"></script>
 
-var myGamePiece;
-var myObstacles = [];
-var myScore;
-var forward = true;
-var beep = true;
-
-function startGame() {
-    myGamePiece = new component(15, 15, "yellow", 10, 120);
-    myGamePiece.gravity = 0.55;
-    myScore = new component("30px", "Consolas", "green", 280, 40, "text");
-    myGameArea.start();
-}
-
-var myGameArea = {
-    canvas : document.createElement("canvas"),
-    start : function() {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 20);
-        },
-    clear : function() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-}
-
-function component(width, height, color, x, y, type) {
-    this.type = type;
-    this.score = 0;
-    this.width = width;
-    this.height = height;
-    this.speedX = 0;
-    this.speedY = 0;    
-    this.x = x;
-    this.y = y;
-    this.gravity = 0;
-    this.gravitySpeed = 0;
-    this.update = function() {
-        var ctx = myGameArea.context;
-        if (this.type == "text") {
-            ctx.font = this.width + " " + this.height;
-            ctx.fillStyle = color;
-            ctx.fillText(this.text, this.x, this.y);
-        } else {
-            ctx.fillStyle = color;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        }
-    }
-    this.newPos = function() {
-        this.gravitySpeed += this.gravity;
-        this.x += this.speedX;
-        this.y += this.speedY + this.gravitySpeed;
-        this.hitBottom();
-    }
-    this.hitBottom = function() {
-        var rockbottom = myGameArea.canvas.height - this.height;
-        if (this.y > rockbottom) {
-            this.y = rockbottom;
-            this.gravitySpeed = 0;
-        }
-    }
-    this.crashWith = function(otherobj) {
-        var myleft = this.x;
-        var myright = this.x + (this.width);
-        var mytop = this.y;
-        var mybottom = this.y + (this.height);
-        var otherleft = otherobj.x;
-        var otherright = otherobj.x + (otherobj.width);
-        var othertop = otherobj.y;
-        var otherbottom = otherobj.y + (otherobj.height);
-        var crash = true;
-        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
-            crash = false;
-        }
-        return crash;
-    }
-}
-
-function updateGameArea() {
-    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
-    for (i = 0; i < myObstacles.length; i += 1) {
-        if (myGamePiece.crashWith(myObstacles[i])) {
-            return;
-        } 
-    }
-    myGameArea.clear();
-    myGameArea.frameNo += 1;
-    if (myGameArea.frameNo == 1 || everyinterval(60)) {
-        x = myGameArea.canvas.width;
-        minHeight = 20;
-        maxHeight = 200;
-        height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
-        minGap = 80;
-        maxGap = 200;
-        gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
-        myObstacles.push(new component(10, height, "red", x, 0));
-        myObstacles.push(new component(10, x - height - gap, "red", x, height + gap));
-    }
-    for (i = 0; i < myObstacles.length; i += 1) {
-        myObstacles[i].x += -2;
-        myObstacles[i].update();
-    }
-    myScore.text="SCORE: " + myGameArea.frameNo;
-    myScore.update();
-    myGamePiece.newPos();
-    myGamePiece.update();
-    if(forward){
-    	myGamePiece.x += 1.5;
-    }else{
-    	myGamePiece.x -= 1.5;
-    }
-    if(myGamePiece.x>=100){
-    	forward = false;
-    }
-    if(myGamePiece.x<=10){
-    	forward = true;
-    }
-    
-    
-}
-
-function everyinterval(n) {
-    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
-    return false;
-}
-
-function accelerate(n) {
-    myGamePiece.gravity = n;
-}
-</script>
 
 
 <br />

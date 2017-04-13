@@ -5,12 +5,14 @@ img{
 body{
     text-align: center;
     font-family: "Comic Sans MS";
+    background-color: #76b2f2;
+    color: #ffffff;
 }
 h1{
     font-size: 300%;
 }
 h1:hover{
-    color: #40bbe8;
+    color: #674aa8;
 }
 p{
     font-size: 200%;
@@ -25,7 +27,7 @@ p{
 font-family: 'Revalia', cursive;
 
 }
-.roarer:hover{
+#roarer:hover{
     color: #40bbe8;
     
 }
