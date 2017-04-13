@@ -1,0 +1,15 @@
+body{
+    text-align: center;
+    background-color: #76b2f2;
+    font-family: "Verdana";
+    color: #ffffff;
+}
+#wheeeee{
+    width: 500px;
+    height: 200px;
+    color: #000000;
+    background-color:#ce3d72;
+    border-radius: 30px;
+    font-family: "Comic Sans MS";
+    font-size: 20px;
+}
