@@ -1,0 +1,59 @@
+@charset "utf-8";
+/* CSS Document */
+body{
+	text-align: center;
+	background-color: #C691D7
+}
+header{
+	font-family: Arial;
+	color: #DFDFDF;
+}
+h1{
+	
+	font-size:40px;
+}
+table, th, td{
+	
+	border: 2px solid;
+	border-color: #229224;
+	padding: 10px;
+	font-size: 20px;
+	border-collapse: collapse;
+	text-align: left;
+	border-spacing: 30px; /*no effect with border-collapes on*/
+}
+
+table.scheduleTable tr:nth-child(even){
+	background-color: #ddd;
+}
+table.scheduleTable tr:nth-child(odd){
+	background-color: #fff;
+}
+table.productivityTable tr:nth-child(even){
+	background-color: #ddd;
+}
+table.productivityTable tr:nth-child(odd){
+	background-color: #fff;
+}
+.scheduleTable{
+	float:left;
+}
+.productivityTable{
+	float:left;
+}
+.spacer{
+	float:left;
+}
+.proHeader{
+	font-size: 35px;
+	font-family: Helvetica;
+}
+.proRowHeader{
+	font-size: 25px;
+	font-family: Helvetica;
+}
+.formy{
+	float:left;
+	margin-top:  30px;
+	font-size: 40px;
+}
