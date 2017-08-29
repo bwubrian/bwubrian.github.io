@@ -37,7 +37,7 @@ function draw() {
 }
 
 function drawPoint() {
-  //alert("DON'T TOUCH THE MASTERPIECE! NO COLLABORATION!");
+
   pointsData.push({x: mouseX, y: mouseY});
   return false;
 }
@@ -45,14 +45,12 @@ function drawPoint() {
 $("#saveDrawing").on("click", saveDrawing);
 
 function saveDrawing() {
-  saveCanvas("Painter Orpheus");
+  saveCanvas("Join PHHS Hack Club");
 }
 
 $("#clearDrawing").on("click", clearDrawing);
 
 function clearDrawing() {
-  //alert("HOW DARE YOU!");
-  
   pointsData.remove();
   points = [];
   
