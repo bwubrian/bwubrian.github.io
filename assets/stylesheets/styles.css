@@ -79,7 +79,7 @@ nav ul {
 nav li {
   display: inline-block;
   font-family: 'Roboto', sans-serif;
-  font-weight: bold;
+  font-weight: normal;
   font-size: 30px;
   line-height: 40px;
   height: 40px;
@@ -176,7 +176,7 @@ h2{
 * {box-sizing: border-box} /*bars don't go outside border*/
 
 .container {
-  width: 100%;
+  width: 98%; /*hard coded to make end of bar distanced from edge of border css is too hard*/
   background-color: #ddd;
   margin: 10px;
 }
