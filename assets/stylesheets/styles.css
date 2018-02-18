@@ -46,10 +46,10 @@ table {
 
 
 body{
-  --color-one: #ffd754; /*blue*/
-  --color-two: #32322C; /*black32322C*/
-  --color-three: #edfbff; /*white*/
-  --color-four: #bc0d0d; /*red*/
+  --color-one: #F77F00; /*blue ffd754*/
+  --color-two: #003049; /*black 32322C*/
+  --color-three: #EAE2B7; /*white edfbff*/
+  --color-four: #D62828; /*red bc0d0d*/
   background-color: var(--color-one);
 }
 
@@ -96,7 +96,7 @@ nav a {
  
 nav a:hover {
   font-size: 50px;
-  color: var(--color-four);
+  color: var(--color-two);
 }
 
 /*dont understand the second one overriding...*/
@@ -111,7 +111,7 @@ nav li:after {
 }
 nav li:hover:after {
   width: 100%;
-  background: var(--color-four);
+  background: var(--color-two);
 }
 
 
@@ -126,7 +126,7 @@ nav li:after {
 }
 nav li:hover:after {
   width: 100%;
-  background: var(--color-four);
+  background: var(--color-two);
 }
 /*...but it works*/
 
@@ -167,7 +167,7 @@ h2{
 
 .topics {
   font-family: 'Roboto', sans-serif;
-  color: var(--color-two);
+  color: var(--color-three);
   padding: 40px 50px 40px 50px; /*up right down left*/
 }
 
