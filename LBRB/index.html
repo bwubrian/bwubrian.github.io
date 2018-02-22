@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang = "en">
+	<head>
+		<meta charset = "utf-8">
+		<title>Left Back Right Back</title>
+
+		<link rel="stylesheet" type="text/css" href="assets/stylesheets/styles.css">
+
+		<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+	</head>
+	<body>
+		<!--
+		<div id="progress">
+		  <div id="progressBar"></div>
+		</div> 
+		-->
+
+		<div id="progress">
+			<div id = "barHolder1">
+		  		<div id="bar1"></div>
+		    </div>
+		    <div id = "barHolder2">
+		  		<div id="bar2"></div>
+		    </div>
+		</div>
+
+
+
+		<h1 id = "text">BACK</h1>
+
+		<button onclick="beginChange()">BEGIN</button>
+		<button onclick="endChange()">STOP</button>
+
+		<p id = "count">0</p>
+
+		<div class = "slideContainer">
+			<input id = "intervalSlider" type="range" min="400" max="5000" step="100" value = "1500" oninput= "displayIntervalValue(this.value)">
+		</div>
+		<p>Interval: <span id = "intervalLabel">1500</span> milliseconds</p>
+
+		<script type="text/javascript" src="assets/main.js"></script>
+	</body>
+</html>
