@@ -3,17 +3,24 @@
 	<head>
 		<meta charset = "utf-8">
 		<title>Brian Wu</title>
-
+		<!--CSS-->
 		<link rel = "stylesheet" href = "assets/stylesheets/styles.css">
-		
-		<link href="https://fonts.googleapis.com/css?family=Abel|Amatic+SC|Nanum+Pen+Script|Quicksand|Fredericka+the+Great|Oswald|Roboto" rel="stylesheet">
-		
+		<!--Google Fonts-->
+		<link href="https://fonts.googleapis.com/css?family=Abel|Amatic+SC|Nanum+Pen+Script|Quicksand|Fredericka+the+Great|Oswald|Roboto|Roboto+Condensed|Shadows+Into+Light+Two|Montserrat" rel="stylesheet">
+		<!--Favicon-->
 		<link rel="icon" href="assets/bw.png" type="image" sizes="16x16">
 	</head>
 	<body>
 		<header>
-			<nav class = "foo">
+			<nav class = "navbar">
 				<ul>
+					<!--
+					<li id="wuyoujie" style="width:7%;height:7%"">
+						<a href="index.html">
+					  		<img src="assets/calligraphie_horzontal_02.png" alt="WU YOU JIE" style="width:100%;height:100%;border:0;">
+						</a>
+					</li>
+					-->
 					<li><a href = "#about_me">About</a></li>
 					<li><a href = "#my_projects">Projects</a></li>
 					<li><a href = "#contact">Contact</a></li>
@@ -23,55 +30,147 @@
 		
 		<section>
 			<div class = "landing_message">
-				<p id = "my_intro" ><span id = "greeting">Good Day!</span>, i'm</p>
+				<p id = "my_intro" ><span id = "greeting">... </span>, i'm</p>
 				<p id = "my_name" >Brian Wu</p>
 			</div>
 		</section>
 
 		<section>
-
 			<div class = "topics" id = "about_me">
-				<h2>About Me</h1>
+				<h2>About Me</h2>
 				<p>My name is Brian Wu. I'm a high school senior. </p>
 
 				<div id = "languages">
 					<h1>Languages</h1>
 
 					<p>English</p>
-					<div class="container">
+					<div class="languages_bar">
 					  <div class="skills english">Fluent</div>
 					</div>
 
 					<p>Python</p>
-					<div class="container">
+					<div class="languages_bar">
 					  <div class="skills python">Learning</div>
 					</div>
 
 					<p>HTML</p>
-					<div class="container">
+					<div class="languages_bar">
 					  <div class="skills html">Enough to make this</div>
 					</div>
 
 					<p>Mandarin</p>
-					<div class="container">
+					<div class="languages_bar">
 					  <div class="skills mandarin">Struggling</div>
 					</div>
 				</div>
 			</div>
 
+
+
+
 			<div class = "topics" id = "my_projects">
-				<h2>My Projects</h1>
+				<h2>My Projects</h2>
 				<p>Prepare to be <s>impressed</s> disappointed.</p>
-				<ul>
-					<li><a href = "https://bwubrian.github.io/wuyoujie/">Hack Club Sample Site</a></li>
-					<li><a href = "https://bwubrian.itch.io/when-cows-fly">When Cows Fly</a></li>
-				</ul>
+
+
+
+				<div id = "wcf_project_card" class="project_card" onmouseenter="revealProject(this.id)" onmouseleave="hideProject(this.id)">
+					<img class="project_card_img" src="assets/wcf_2.png" alt="When Cows Flys"  border="0">
+				  	<div id = "when_cows_fly_revealed" class="project_card_revealed">
+				      	
+				      	<div class="project_card_text">
+				      		<h4>When Cows Fly</h4> 
+				      		<p>A 2D side-scrolling platformer with randomly generated levels. Written in C# in Unity built with WebGL.</p> 
+				   		</div>
+				   		<button class = "project_card_button" onclick = "window.open('https://bwubrian.itch.io/when-cows-fly')">Play Game</button>
+				    </div>
+				</div>
+
+				<div id = "dual_project_card" class="project_card" onmouseenter="revealProject(this.id)" onmouseleave="hideProject(this.id)">
+					<img class="project_card_img" src="assets/dual_0.png" alt="DUAL" border="0">
+				  	<div id = "dual_revealed" class="project_card_revealed">
+				      	<div class="project_card_text">
+				      		<h4>DUAL</h4> 
+				      		<p>A simple arcade-style shooter with option of local multiplayer(PvP) or against a computer player(PvE). Written in Java using Graphics2D.</p> 
+				   		</div>
+				   		<button class = "project_card_button" id="myBtn">Video Demo</button>
+				    </div>
+				</div>
+		   		<div id="myModal" class="modal">
+			   		    <div class="modal-content">
+				   		    <div class="modal-header">
+				   		      <span class="close">&times;</span>  <!-- &times; is the X to close -->
+				   		      <h2>DUAL</h2>
+				   		      <h3>Video of player versus computer.</h3>
+				   		    </div>
+				   		    <div class="modal-body">
+			   		      		<video id = "dual_video" width="1280" height="660" controls>
+			   		    	  		<source src="assets/DUAL_GAMEPLAY_DEMO_3.mp4" type="video/mp4">
+			   		    		</video>
+			   		    	</div>
+			   		    	<!--
+				   		    <div class="modal-footer">
+				   		      <h3>Video of player versus computer.</h3>
+				   		    </div>
+				   			-->
+			   		    </div>
+		   		</div>
+
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		<br>
+		   		
 			</div>
 
+			
+
+
 			<div class = "topics" id = "contact">
-				<h2>Contact Info</h1>
-				<p>bwubrian@gmail.com</p>
-				<p><a href = "https://github.com/bwubrian">Github</a></p>
+				<h2>Contact Info</h2>
+
+				<div id = "contact_info">
+					<div class = "contact_container">
+						<!--<p class = "contact_text"><a href="mailto:bwubrian@gmail.com?Subject=Hello%20again" target="_top">bwubrian@gmail.com</a></p>-->
+						<p class = "contact_text">bwubrian@gmail.com</p>
+						<a class = "contact_img" href="mailto:bwubrian@gmail.com?Subject=Hello" target="_blank">
+							<img border="0" alt="My Email" src="assets/gmail_icon2.svg" width="25" height="25">
+						</a>
+					</div>
+
+					<div class = "contact_container">
+						<!--<p class = "contact_text"><a href = "https://github.com/bwubrian">Github</a></p>-->
+						<p class = "contact_text">bwubrian</p>
+
+						<a class = "contact_img" href="https://github.com/bwubrian" target="_blank">
+							<img border="0" alt="My Github" src="assets/GitHub-Mark-120px-plus.png" width="25" height="25">
+						</a>
+					</div>
+				</div>
+
+
 			</div>
 
 		</section>
@@ -79,8 +178,9 @@
 
 
 		<!-- LEAVE THIS ON THE BOTTOM OR WASTE LIKE 3 HOURS AGAIN -->
-     	<script src="assets/script.js"></script>
+     	
      	<script src="https://unpkg.com/scrollreveal/dist/scrollreveal.min.js"></script>
+     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
      	<script src="assets/script.js"></script>
    	</body>
 </html>

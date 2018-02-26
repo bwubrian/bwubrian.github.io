@@ -48,26 +48,21 @@ table {
 body{
   --color-one: #F77F00; /*blue ffd754*/
   --color-two: #003049; /*black 32322C*/
-  --color-three: #EAE2B7; /*white edfbff*/
+  --color-three: #f4f1de; /*white edfbff*/
   --color-four: #D62828; /*red bc0d0d*/
   background-color: var(--color-one);
 }
-
-
-
 
 h1{
   font-size: 30px;
 }
 
-
-
+/*NAVIGATION*/
 header{
   background-color: var(--color-one); /*blue*/
   color: var(--color-two); /*black*/
   text-align: right;
 }
-
 
 nav ul {
   list-style: none;
@@ -78,18 +73,27 @@ nav ul {
 }
 nav li {
   display: inline-block;
-  font-family: 'Roboto', sans-serif;
+  
+  font-family: 'Amatic SC', cursive;
+  font-family: 'Shadows Into Light Two', cursive;
+  /*font-family: 'Montserrat', cursive;*/
+  
+
   font-weight: normal;
   font-size: 30px;
   line-height: 40px;
   height: 40px;
   border-bottom: 0px solid var(--color-three); /*white*/
-  margin: 20px 40px; /*first number is up/down, second is left/right*/
+  margin: 15px 40px; /*first number is up/down, second is left/right*/
 }
- 
+
+nav #wuyoujie{
+  float: left;
+}
+
 nav a {
   text-decoration: none;
-  color: #edfbff;
+  color: var(--color-three);
   display: inline-block;
   transition: color 0.5s ease, font-size 0.5s ease;
 }
@@ -114,7 +118,6 @@ nav li:hover:after {
   background: var(--color-two);
 }
 
-
 nav li:after {
   content: '';
   display: block;
@@ -131,11 +134,7 @@ nav li:hover:after {
 /*...but it works*/
 
 
-h2{
-  font-size: 60px;
-  padding-bottom: 40px;
-}
-
+/*LANDING MESSAGE*/
 #my_intro{
   font-family: 'Nanum Pen Script', cursive;
   font-size: 100px;
@@ -155,62 +154,279 @@ h2{
   
   color: var(--color-one); /*blue*/
   background-color: var(--color-two); /*black*/
-
   
   width: 100%;
-  
   text-align: center;
-
   font-family: 'Quicksand', sans-serif; /*shouldn't matter*/
-
 }
 
+
+/*TOPICS*/
 .topics {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto Condensed', sans-serif;
   color: var(--color-three);
   padding: 40px 50px 40px 50px; /*up right down left*/
 }
 
+h2{
+  font-size: 60px;
+  padding-bottom: 40px;
+}
 
+#about_me{
+  background-color: var(--color-three);
+  color: var(--color-two);
+}
 
+    /*Languages Graph*/
 * {box-sizing: border-box} /*bars don't go outside border*/
-
-.container {
+.languages_bar{
   width: 98%; /*hard coded to make end of bar distanced from edge of border css is too hard*/
   background-color: #ddd;
   margin: 10px;
+  border-radius: 10px 10px 10px 10px; /* top-left, top-right, bot-right, bot-left */
 }
-
 .skills {
   text-align: right;
   padding-right: 20px;
   line-height: 40px;
-  color: white;
+  color: var(--color-three);
+  border-radius: 10px;
 }
-
 .english {
-  width: 100%; background-color: #4CAF50;
+  width: 100%; background-color: var(--color-one);
 }
 .python {
-  width: 60%; background-color: #2196F3;
+  width: 60%; background-color: var(--color-one);
+
 }
 .html {
-  width: 40%; background-color: #f44336;
+  width: 40%; background-color: var(--color-one);
 }
 .mandarin {
-  width: 20%; background-color: #808080;
+  width: 20%; background-color: var(--color-one);
 }
-
 #languages p{
   padding: 20px 0px 5px 0px; /*up right down left*/
   color: var(--color-two);
 }
-
 #languages{
   border: solid 2px;
   padding: 20px;
   width: 50%;
   margin: auto;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+
+/*MY PROJECTS*/
+#my_projects{
+  background-color: var(--color-two);
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+
+.project_card {
+    box-shadow: 4px 6px 12px 0 rgba(0,0,0,0.8);
+    transition: 0.3s;
+    width: 400px;
+    height: 300px;
+    background-color: var(--color-three);
+    padding: 0px 0px 20px 0px; /*up right down left*/
+    margin: 30px;
+    transition: width 0.5s ease;
+}
+
+.project_card:hover {
+    box-shadow: 8px 12px 24px 0 rgba(0,0,0,1);
+    width: 800px;
+    height: 300px;
+}
+
+.project_card_text{
+    padding: 10px 30px 0px 30px; /*up right down left*/
+    opacity: inherit;
+    text-align: right;
+
+    color: var(--color-one);
+}
+
+.project_card_text h4{
+  font-size: 40px;
+  padding: 0px 0px 30px 0px; /*up right down left*/
+}
+
+.project_card_text p{
+  font-size: 16px;
+  padding: 0px 0px 0px 0px; /*up right down left*/
+}
+
+.project_card_img{
+  width: 400px;
+  height: 300px;
+  float: left;
+  border: 2px solid var(--color-three);
+}
+
+#when_cows_fly_revealed{ /*need for every single project because js is based off ID*/
+  display: none;
+  opacity: 0;
+}
+#dual_revealed{
+  display: none;
+  opacity: 0;
+}
+#wcf_project_card{
+  position: absolute;
+  display: inline-block;
+  left: 4%;
+}
+#dual_project_card{
+  position: absolute;
+  display: inline-block;
+  left: 50%;
+}
+
+
+
+.project_card_button{
+    background-color: var(--color-three); 
+    color: var(--color-two); 
+    border: 2px solid var(--color-one);
+    padding: 16px 32px;
+    margin: 0px 0px;
+
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+
+    font-size: 16px;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-align: center;
+    text-decoration: none;
+
+    display: inline-block;
+
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+
+.project_card_button:hover {
+    background-color: var(--color-one);
+    color: var(--color-three);
+}
+
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: var(--color-three);
+    margin: auto;
+    padding: 0;
+    border: 1px solid black;
+    width: 1284px;
+    height: 780px;
+    box-shadow: 0 0px 0px 0 rgba(0,0,0,0.2),0 0px 0px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+    color: var(--color-two);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: var(--color-one);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-header {
+    padding: 2px 16px 10px 30px; /*up right down left*/
+    background-color: var(--color-three);
+    color: var(--color-two);
+}
+.modal-header h2{
+    padding: 20px 0px 0px 0px; /*up right down left*/
+}
+.modal-header h3{
+    padding: 5px 0px 0px 4px; /*up right down left*/
+}
+
+.modal-body {
+  padding: 0px 0px 0px 0px; /*up right down left*/
+  background-color: var(--color-three);
+}
+
+#dual_video{
+    margin: auto;
+    padding: 0;    
+}
+
+
+
+
+/*CONTACT*/
+#contact{
+  background-color: var(--color-one);
+}
+
+#contact_info{
+  width: 70%;
+  text-align: center;
+  margin: auto;
+}
+
+.contact_container{
+  padding: 0px 10px 0px 10px; /*up right down left*/
+  display: inline-block;
+  
+}
+
+.contact_text{
+  float: right;
+  padding: 0px 0px 0px 0px; /*up right down left*/
+
+  font-size: 25px;
+}
+
+.contact_img{
+  float: left;
+  padding: 0px 10px 0px 10px; /*up right down left*/
 }
 
 
