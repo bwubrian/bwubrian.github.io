@@ -1,2 +1,2 @@
 # bwubrian.github.io
-README
+A bunch of random things I've made to learn.
