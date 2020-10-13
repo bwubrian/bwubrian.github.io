@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+    <title>Brian Wu - CS 194-26 Project 3</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="everything">
+        <div class="title">
+            <h1>CS 194-26 Fall 2020</h1> 
+            <h2>Project 3: Face Morphing</h2> 
+            <h3>Brian Wu</h3>
+        </div>
+        
+        <h2>Defining Correspondences</h2>
+        <div class="1.1">
+            <p>The first step of the morphing process between two faces is defining corresponding points between them. We then take the average of these points, and find a triangluation on the average points to get the average shapes. Here I used Delaunay triangulation to ensure "good" triangles.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/brian_triangulation.jpg">
+                        <figcaption>[me]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/caps_triangulation.jpg">
+                        <figcaption>[g2 caps]</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>Computing the "Mid-way Face"</h2>
+        <div class="1.2">
+            <p>After finding the corresponding triangulation for both faces, we can find a mid-way face by warping both images to the average shape, then averaging their colors at each point.</p>
+            <div class="row">
+                <div class="three-column">
+                    <figure>
+                        <img src="output/aligned_brian.jpg">
+                        <figcaption>[me]</figcaption>
+                    </figure>
+                </div>
+                <div class="three-column">
+                    <figure>
+                        <img src="output/aligned_caps.jpg">
+                        <figcaption>[g2 caps]</figcaption>
+                    </figure>
+                </div>
+                <div class="three-column">
+                    <figure>
+                        <img src="output/midway_brian_caps.jpg">
+                        <figcaption>[midway]</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+
+        <h2>The Morph Sequence</h2>
+        <div class="1.3">
+            <p>Now, we can follow the exact same logic as the midway face, but instead of just warping to halfway between the two, we can morph to multiple images along the way, effectively interpolating between the shapes and colors of the two images. These images form the frames of a video sequence going from one to the other.</p>
+            <div style="text-align: center;">
+                <iframe  width="511" height="728" src="https://www.youtube.com/embed/Fm2O0cKwnWs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <h2>The "Mean face" of a population</h2>
+        <div class="1.4">
+            <p>We can also find the mean face of a population by taking corresponding points from each face, averaging them and performing triangulation to get the average shape, then morphing each face to this average shape and averaging their colors.</p>
+            <p>The following process was applied to a subset of the IMM face database[1]. Since the annotations on these images only contain the inner portion of the face, I added the 4 corners of the image as triangulation points as well to allow for better morphing.</p>
+            <p>[1] M. B. Stegmann, B. K. Ersbøll, and R. Larsen. FAME – a flexible appearance modelling environment. IEEE Trans. on Medical Imaging, 22(10):1319–1331, 2003
+            </p>
+            
+            <p>Examples of original images warped into average shape.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/01-1m.jpg">
+                        <figcaption>[01-1m original]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/01-1m-toaverage.jpg">
+                        <figcaption>[01-1m morphed to average shape]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/06-1m.jpg">
+                        <figcaption>[06-1m original]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/06-1m-toaverage.jpg">
+                        <figcaption>[06-1m morphed to average shape]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/12-1f.jpg">
+                        <figcaption>[12-1f original]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/12-1f-toaverage.jpg">
+                        <figcaption>[12-1f morphed to average shape]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>Final averaged morphed face, and triangulation.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/average_all_1.jpg">
+                        <figcaption>[average all]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes_average_all_1_triangulation.jpg">
+                        <figcaption>[average points and triangulation]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>Warping my face to average shape of IMM database face, warping average face of IMM to my shape.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/rescaled_new_brian.jpg">
+                        <figcaption>[original me]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/new_brian_to_dane_shape.jpg">
+                        <figcaption>[me warped into the average geometry of IMM]<br>(aka a couple pizzas later)</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/aligned_average_all_1.jpg">
+                        <figcaption>[IMM average face]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/dane_to_new_brian_shape.jpg">
+                        <figcaption>[IMM average face warped into my geometry]<br></figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>Caricatures: Extrapolating from the mean</h2>
+        <div class="1.5">
+            <p>Instead of morphing towards the IMM population mean, I can also morph away from it, in the direction of my own image, to produce a sort of caricature of myself. This effectively emphasizes the difference between my face and the average.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/rescaled_new_brian.jpg">
+                        <figcaption>[original me]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/danes/new_brian_caricature.jpg">
+                        <figcaption>[me morphed into caricature of myself based on average geometry of IMM]<br>(yeah, this is big brain time)</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>Bells and Whistles</h2>
+        <div class="1.6">
+            <h3>#1 - Changing Gender</h3>
+            <p>Taking average faces from subpopulation, in this case Male and Female Han Chinese faces [2]. Following the algorithm in [3], I can morph an image of myself towards female and male averages, in both shape and color.</p>
+            <p>[2] https://pmsol3.wordpress.com/2009/10/10/world-of-facial-averages-east-southeast-asia-pacific-islander/</p>
+            <p>[3] http://graphics.cs.cmu.edu/courses/15-463/2004_fall/www/Papers/faces.pdf</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/average_male.jpg">
+                        <figcaption>[average chinese female]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/average_female.jpg">
+                        <figcaption>[average chinese female]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>Me to female:</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/cropped_rescaled_new_brian.jpg">
+                        <figcaption>[original me]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/me_to_female_shape.jpg">
+                        <figcaption>[changing just shape]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/me_to_female_color.jpg">
+                        <figcaption>[changing just color]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/me_to_female_morph.jpg">
+                        <figcaption>[changing both shape and color]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>Me to male:</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/cropped_rescaled_new_brian.jpg">
+                        <figcaption>[original me]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/me_to_male_shape.jpg">
+                        <figcaption>[changing just shape]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/me_to_male_color.jpg">
+                        <figcaption>[changing just color]</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/me_to_male_morph.jpg">
+                        <figcaption>[changing both shape and color]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>While the differences in shape are very apparent, I think my original image was already very close in color to both averages, so there wasn't a significant difference in color morphing.</p>
+        </div>
+        <h3>#2 - PCA</h3>
+        <p>I also performed PCA on the IMM danes face dataset. To do this, first downscaled the images (to get around memory issues), grayscaled them, flattened each one into a vector, and stacked these into a matrix, with each row representing one image. Since my images were 120 x 160, this resulted in a 40 x 19200 matrix. I then evaluated the Singular Value Decomposition on this matrix, extracting  U, S, and V_T.</p>
+        <p>The columns of V_T here represent eigenfaces (the eigenvectors) in the order of decreasing singular value. I show the first couple here.</p>
+        <div class="row">
+            <div class="three-column">
+                <figure>
+                    <img src="output/eigenface0.jpg">
+                    <figcaption>[eigenface0]</figcaption>
+                </figure>
+            </div>
+            <div class="three-column">
+                <figure>
+                    <img src="output/eigenface1.jpg">
+                    <figcaption>[eigenface1]</figcaption>
+                </figure>
+            </div>
+            <div class="three-column">
+                <figure>
+                    <img src="output/eigenface2.jpg">
+                    <figcaption>[eigenface2]</figcaption>
+                </figure>
+            </div>
+        </div>
+        <p>With these matrices in hand, I can also reconstruct the original images using only the first k eigenfaces, with a method similar to [4]. From these samples its clear that we can already get the basic structure of a person with less than half the eigenvectors, but we really need more if we want a clearer representation.</p>
+        
+        <div class="row">
+            <div class="three-column">
+                <figure>
+                    <img src="output/k7_dude_1.jpg">
+                    <figcaption>[k = 7]</figcaption>
+                </figure>
+            </div>
+            <div class="three-column">
+                <figure>
+                    <img src="output/k15_dude_1.jpg">
+                    <figcaption>[k = 15]</figcaption>
+                </figure>
+            </div>
+            <div class="three-column">
+                <figure>
+                    <img src="output/k30_dude_1.jpg">
+                    <figcaption>[k = 30]</figcaption>
+                </figure>
+            </div>
+        </div>
+        <p>[4] http://graphics.cs.cmu.edu/courses/15-463/2004_fall/www/handins/brh/final/</p>
+    </div>
+</body>
+</html>
