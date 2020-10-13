@@ -1,0 +1,76 @@
+
+* {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+.everything {
+  padding-left: 20%;
+  padding-right: 20%;
+}
+
+.title {
+    margin: 0 auto;
+    background: white;
+    padding: 0px;
+    color: black;
+    text-align: left;
+}
+
+img {
+  max-width:100%;
+  max-height:100%;
+}
+
+figure {
+  margin: auto;
+  text-align: center;
+  
+}
+
+figcaption {
+  background-color: white;
+  color: black;
+  font-style: normal;
+  padding: 2px;
+  text-align: center;
+}
+
+
+/* Three image containers (use 25% for four, and 50% for two, etc) */
+.one-column {
+  float: left;
+  width: 100%;
+}
+
+/* Three image containers (use 25% for four, and 50% for two, etc) */
+.two-column {
+    float: left;
+    width: 50%;
+}
+
+  /* Three image containers (use 25% for four, and 50% for two, etc) */
+.three-column {
+  
+  float: left;
+  width: 33%;
+}
+
+/* .youtube {
+  text-align: center;
+} */
+
+.high{
+  max-width:100%;
+  max-height:100%;
+}
+
+.row{
+  padding-top: 10px;
+}
+/* Clear floats after image containers */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+  padding-bottom: 10px;
+} 
