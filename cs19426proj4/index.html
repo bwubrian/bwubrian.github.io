@@ -10,7 +10,7 @@
             <h1>CS 194-26 Fall 2020</h1> 
             <h2>Project 4: Facial Keypoint Detection with Neural Networks
             </h2> 
-            <h3>Brian Wu</h3>
+            <h3></h3>
         </div>
         <h3>Table of Contents</h3>
         <ol>
@@ -172,8 +172,8 @@
         <div class="1.3">
             <p>In the last part of this project I train on a much larger (and messier) dataset: ibug face in the wild. This dataset of 6666 images is annotated with bounding boxes around the relavant face in the image, as well as 68 facial keypoints. This means some of the preprocessing involves finding the relative offsets to extract the portion within the bounding box, resizing this portion to be 240x240 pixels for each image, and applying the same data augmentations as Part 2.</p>
             <p>For this part I also used the powerful ResNet as my architecture instead of building a CNN from scratch. This particular model comes in multiple sizes. I started with ResNet18 and did a lot of experimentation for this part, but eventually found that ResNet50 performed better. To use these models, I load them in and replace the first and last layers with the correct input and output shapes (e.g. 136 out_features in the last layer to predict 68 points). I also used them with pretrained weights, such that I could efficiently fine-tune on the ibug dataset without training too much.</p>
-            <p>One last thing I experiemented with was using Richard Zhang's <a href="https://richzhang.github.io/antialiased-cnns/">Making Convolutional Networks Shift-Invariant Again.</a> This simple technique involves adding a blurring layer to replace normal operations (e.g. replace MaxPool with Max and a BlurPool). I found that this improved my results a bit.</p>
-            
+            <a name="zhang"><p>One last thing I experiemented with was using Richard Zhang's <a href="https://richzhang.github.io/antialiased-cnns/">Making Convolutional Networks Shift-Invariant Again.</a> This simple technique involves adding a blurring layer to replace normal operations (e.g. replace MaxPool with Max and a BlurPool). I found that this improved my results a bit.</p></a>
+            <p>In the end, my <a href='#part3architecture'>best model</a> was a pretrained ResNet50 with Zhang's antialiasing, fine-tuned on the given dataset for 20 epochs with a learning rate of 5e-4, then trained for another 20 epochs with a learning rate of 1e-4. This achieved a final Mean Absolute Error of <b>5.99842</b> on the <a href="https://www.kaggle.com/c/cs194-26-fa20-proj4">Kaggle Competition</a>.</p>
             <div class="row">
                 <div class="two-column">
                     <figure>
@@ -188,6 +188,107 @@
                     </figure>
                 </div>
             </div>
+            Sampled images from validation set:
+            <div class="row">
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part3/validation_image_0.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part3/validation_image_1.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part3/validation_image_2.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+            Sampled images from testing set:
+            <div class="row">
+                <div class="row">
+                    <div class="two-column">
+                        <figure>
+                            <img src="output/part3/testing_image_41.png">
+                            <figcaption>testing_image_41</figcaption>
+                        </figure>
+                    </div>
+                    <div class="two-column">
+                        <figure>
+                            <img src="output/part3/testing_image_23.png">
+                            <figcaption>testing_image_23</figcaption>
+                        </figure>
+                    </div>
+                    
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part3/testing_image_40.png">
+                        <figcaption>testing_image_40</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part3/testing_image_24.png">
+                        <figcaption>testing_image_24</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part3/testing_image_51.png">
+                        <figcaption>testing_image_51</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part3/testing_image_54.png">
+                        <figcaption>testing_image_54</figcaption>
+                    </figure>
+                </div>
+            </div>
+            
+            Sampled images from custom set:
+            <div class="row">
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part3/custom_image_me.png">
+                        <figcaption>me</figcaption>
+                    </figure>
+                </div>
+                
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part3/custom_image_ford.png">
+                        <figcaption>ford</figcaption>
+                    </figure>
+                </div>
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part3/custom_image_seraphine.png">
+                        <figcaption>seraphine</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>The model does really well for my face, which was taken in normal lighting, facing forwards, with a white background, which may have made it easier. It also does decently well on seraphine's face, since it doesn't look too abnormal compared to images in the training set (though it is inaccurate on one side of the face, maybe because of bad lighting). The model did, however, badly fail to predict the facial features of ford's face, particularly the eyes. I think this could be due to the very wrinkly skin above his eyes, the lack of good lighting on the eyes, and the relatively small part of the image that the face takes up.</p>
+
+            <h3>Bells and Whistles</h3>
+            <p><a href="#zhang">As previously mentioned</a> I experiemented with Zhang's antialiasing max pools and ended up using them in my final model. I found qualitatively it did seem to improve my results. I decided to benchmark on ResNet18 to compare the learning of the antialised version (blurred) vs the normal version. </p>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/part3/antialias_vs_normal_resnet18_loss.png">
+                        <figcaption>ResNet18, lr=1e-4, 10 epochs</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>I wasn't able to find any major differences, though it did seem like the blur version was a bit more stable (e.g. the blur model losses were monotonically decreasing while the normal losses went back up in some epochs). I think the differences between the two were more meaningful in the ResNet50 case, though I did not fully benchmark this.</p>
 
         </div>
 
@@ -218,6 +319,7 @@
                     (fc3): Linear(in_features=512, out_features=116, bias=True)
                 )
             </pre>
+            <p>Learned filters:</p>
             <a name="part2filters"></a>
             <div class="row">
                 <div class="one-column">
@@ -229,8 +331,213 @@
             </div>
             
             <h3><a name="part3architecture">Part 3</a></h3>
+            Resnet50 Model:
             <pre>
-                
+                ResNet(
+                    (conv1): Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+                    (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                    (relu): ReLU(inplace=True)
+                    (maxpool): Sequential(
+                        (0): MaxPool2d(kernel_size=2, stride=1, padding=0, dilation=1, ceil_mode=False)
+                        (1): BlurPool(
+                        (pad): ReflectionPad2d([1, 2, 1, 2])
+                        )
+                    )
+                    (layer1): Sequential(
+                        (0): Bottleneck(
+                        (conv1): Conv2d(64, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        (downsample): Sequential(
+                            (0): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        )
+                        )
+                        (1): Bottleneck(
+                        (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (2): Bottleneck(
+                        (conv1): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                    )
+                    (layer2): Sequential(
+                        (0): Bottleneck(
+                        (conv1): Conv2d(256, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Sequential(
+                            (0): BlurPool(
+                            (pad): ReflectionPad2d([1, 2, 1, 2])
+                            )
+                            (1): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        )
+                        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        (downsample): Sequential(
+                            (0): BlurPool(
+                            (pad): ReflectionPad2d([1, 2, 1, 2])
+                            )
+                            (1): Conv2d(256, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                            (2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        )
+                        )
+                        (1): Bottleneck(
+                        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (2): Bottleneck(
+                        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (3): Bottleneck(
+                        (conv1): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                    )
+                    (layer3): Sequential(
+                        (0): Bottleneck(
+                        (conv1): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Sequential(
+                            (0): BlurPool(
+                            (pad): ReflectionPad2d([1, 2, 1, 2])
+                            )
+                            (1): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        )
+                        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        (downsample): Sequential(
+                            (0): BlurPool(
+                            (pad): ReflectionPad2d([1, 2, 1, 2])
+                            )
+                            (1): Conv2d(512, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                            (2): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        )
+                        )
+                        (1): Bottleneck(
+                        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (2): Bottleneck(
+                        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (3): Bottleneck(
+                        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (4): Bottleneck(
+                        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (5): Bottleneck(
+                        (conv1): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(256, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                    )
+                    (layer4): Sequential(
+                        (0): Bottleneck(
+                        (conv1): Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Sequential(
+                            (0): BlurPool(
+                            (pad): ReflectionPad2d([1, 2, 1, 2])
+                            )
+                            (1): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        )
+                        (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        (downsample): Sequential(
+                            (0): BlurPool(
+                            (pad): ReflectionPad2d([1, 2, 1, 2])
+                            )
+                            (1): Conv2d(1024, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                            (2): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        )
+                        )
+                        (1): Bottleneck(
+                        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                        (2): Bottleneck(
+                        (conv1): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+                        (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (conv3): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1), bias=False)
+                        (bn3): BatchNorm2d(2048, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+                        (relu): ReLU(inplace=True)
+                        )
+                    )
+                    (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+                    (fc): Linear(in_features=2048, out_features=136, bias=True)
+                )
             </pre>
 
         </div>
