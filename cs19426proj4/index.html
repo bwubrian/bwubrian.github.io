@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+    <title>Brian Wu - CS 194-26 Project 3</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="everything">
+        <div class="title">
+            <h1>CS 194-26 Fall 2020</h1> 
+            <h2>Project 4: Facial Keypoint Detection with Neural Networks
+            </h2> 
+            <h3>Brian Wu</h3>
+        </div>
+        <h3>Table of Contents</h3>
+        <ol>
+            <li><a href="#Introduction">Introduction</a></li>
+            <li><a href="#Part1">Part 1</a></li>
+            <li><a href="#Part2">Part 2</a></li>
+            <li><a href="#Part3">Part 3</a></li>
+            <li><a href="#Appendix">Appendix</a></li>
+        </ol>
+        
+
+        <h2><a name="Introduction">Introduction</a></h2>
+        
+        In this project, I will create, train, and tune Convolutional Neural Networks to automatically annotate keypoints on human faces. I use Pytorch to build the models. The entire process involves splitting existing datasets into train/validation splits, building a Pytorch dataloader, constructing the CNN layer by layer, and training this model. In all parts, training involved minimizing the Mean Squared Error loss between the predicted keypoints and the actual landmarks in the dataset, then using the Adam optimizer to update model weights in each iteration. 
+
+
+        <h2><a name="Part1">Part 1: Nose Tip Detection</a></h2>
+        <div class="1.1">
+            <p>I first build a small neural network to detect nose tip location. I used the IMM Face Database, which is annotated with 58 facial keypoints, and focused on just predicting the nose tips.</p>
+            <p>Before training, I first had to preprocess the image data. In particular, I wrote a custom Pytorch dataloader and loaded in the images after downscaling to 60x80 pixels, converting to grayscale, and normalizing the pixel values to between -0.5 and 0.5, which allows for faster and more stable training. I also split my set into a training set and a validation set such that I can accurately validate the error during training.</p>
+            <p>Sampled images from my dataloader visualized with ground-truth keypoints.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part1/nose_ground_truth_1.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part1/nose_ground_truth_2.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>I then had to build the actual model. Here I used a simple CNN, with the <a href="#part2architecture">architecture</a> in the Appendix.</p>
+            <p>I trained with Adam optimizer (lr=1e-5) and MSE loss between actual and predicted landmark location for 20 epochs (cycles through entire training dataset), testing on the validation set at the end of every epoch.</p>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/part1/loss_part_1.png">
+                        <figcaption>[Part 1] Train and validation loss during the training process</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>2 facial images which the network detects the nose correctly. Green=Ground Truth, Red=Predictions</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part1/correct_nose_1.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part1/correct_nose_2.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>2 facial images which the network detects the nose incorrectly. I think it fails in these 2 cases because the faces are not close to the ordinary position. One is shifted far to the left, the other is angled heavily to one side. This is in contrast to the cases where it detects correctly, where the face is facing fowards in the center of the image.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part1/incorrect_nose_1.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part1/incorrect_nose_2.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2><a name="Part2">Part 2: Full Facial Keypoints Detection</a></h2>
+        <div class="1.2">
+            <p>After experiementing with detecting a single nose tip, I transition to detecting points on the whole face. Additionally, since we actually don't have too many training images, one common technique I employ is data augmentation. This involves applying transformations on the original data to effectively generate more data, allowing the model to effecting train more epochs without overfitting as easily. Here, I implemented rotations (by using a rotation matrix to rotate the landmarks as well) and randomly jittered the image brightness.</p>
+
+            <p>Sampled image from my dataloader visualized with ground-truth keypoints.</p>
+            <div class="row">
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part2/ground_truth_1.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part2/ground_truth_2.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="three-column">
+                    <figure>
+                        <img src="output/part2/ground_truth_3.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <p>Since we're predicting all 58 keypoints now, I used a <a href="#part2architecture">larger model</a> for this part to capture the increased complexity of the problem. A critical part was making sure the outputs were 116 dimensional this time (58x2 datapoints for 58 keypoints) instead of just 2 dimensional as in Part 1. Once again I used the Adam optimzer with lr=1e-4, reporting validation loss at the end of each epoch.</p>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/part2/loss_part_2.png">
+                        <figcaption>[Part 2] Train and validation loss during the training process</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <p>2 facial images which the network detects the nose correctly. Green=Ground Truth, Red=Predictions</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part2/correct_0.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part2/correct_1.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>2 facial images which the network detects the nose incorrectly. I think it fails in these 2 cases because the faces are not close to the ordinary position. One is shifted far to the left and angled heavily to one side, while the other is tilted with large smile and hands next to head, which is very irregular in this dataset. This is in contrast to the cases where it detects correctly, where the face is facing fowards in the center of the image.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part2/incorrect_0.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part2/incorrect_1.png">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <p>I also visualize some of the learned filters in Convolutional layers of the CNN. The filters for the <a href='#part2filters'>last layer</a> can be found in the Appendix.</p>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/part2/learned_filters_0.png">
+                        <figcaption>[Part 2] Learned filters in first convolutional layer.</figcaption>
+                    </figure>
+                </div>
+            </div>
+            
+        </div>
+
+        
+        <h2><a name="Part3">Part 3: Train With Larger Dataset</a></h2>
+        <div class="1.3">
+            <p>In the last part of this project I train on a much larger (and messier) dataset: ibug face in the wild. This dataset of 6666 images is annotated with bounding boxes around the relavant face in the image, as well as 68 facial keypoints. This means some of the preprocessing involves finding the relative offsets to extract the portion within the bounding box, resizing this portion to be 240x240 pixels for each image, and applying the same data augmentations as Part 2.</p>
+            <p>For this part I also used the powerful ResNet as my architecture instead of building a CNN from scratch. This particular model comes in multiple sizes. I started with ResNet18 and did a lot of experimentation for this part, but eventually found that ResNet50 performed better. To use these models, I load them in and replace the first and last layers with the correct input and output shapes (e.g. 136 out_features in the last layer to predict 68 points). I also used them with pretrained weights, such that I could efficiently fine-tune on the ibug dataset without training too much.</p>
+            <p>One last thing I experiemented with was using Richard Zhang's <a href="https://richzhang.github.io/antialiased-cnns/">Making Convolutional Networks Shift-Invariant Again.</a> This simple technique involves adding a blurring layer to replace normal operations (e.g. replace MaxPool with Max and a BlurPool). I found that this improved my results a bit.</p>
+            
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part3/part3_blur_resnet50_5e4_20_loss.png">
+                        <figcaption>resnet50 lr=5e-4</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/part3/part3_blur_resnet50_5e4_20_1e4_20_loss.png">
+                        <figcaption>resnet50 lr=1e-4</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+        </div>
+
+        <h2><a name="Appendix">Appendix</a></h2>
+        <div class="1.4">
+            <p>In the following architectures, I place a ReLU layer after every layer except the last. I also use a Maxpool2D (size 2x2) layer after the ReLU of every convolutional layer.</p>
+            <h3><a name="part1architecture">Part 1</a></h3>      
+            <pre>
+                Net(
+                    (conv1): Conv2d(1, 12, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (conv2): Conv2d(12, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (conv3): Conv2d(24, 36, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (fc1): Linear(in_features=2520, out_features=500, bias=True)
+                    (fc2): Linear(in_features=500, out_features=2, bias=True)
+                )
+            </pre>
+
+            <h3><a name="part2architecture">Part 2</a></h3>
+            <pre>
+                Net(
+                    (conv1): Conv2d(1, 6, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (conv2): Conv2d(6, 12, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (conv3): Conv2d(12, 18, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (conv4): Conv2d(18, 24, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+                    (conv5): Conv2d(24, 30, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2))
+                    (fc1): Linear(in_features=4950, out_features=2048, bias=True)
+                    (fc2): Linear(in_features=2048, out_features=512, bias=True)
+                    (fc3): Linear(in_features=512, out_features=116, bias=True)
+                )
+            </pre>
+            <a name="part2filters"></a>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/part2/learned_filters_4.png">
+                        <figcaption>[Part 2] Learned filters in last convolutional layer.</figcaption>
+                    </figure>
+                </div>
+            </div>
+            
+            <h3><a name="part3architecture">Part 3</a></h3>
+            <pre>
+                
+            </pre>
+
+        </div>
+    
+    </div>
+</body>
+</html>
