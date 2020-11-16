@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+    <title>Brian Wu - CS 194-26 Project 5a</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="everything">
+        <div class="title">
+            <h1>CS 194-26 Fall 2020</h1> 
+            <h2>Project 5a: IMAGE WARPING and MOSAICING</h2> 
+            <h5>Brian Wu</h5>
+        </div>
+
+        <h2>Introduction</h2>
+        <p>In this project I take pictures and perform homographies on them to warp them. These projective transformations allow me to accomplish rectification and morphing of images into a mosaic.</p>
+
+        <h2>Recover homographies</h2>
+        <div class="1.1">
+            <p>A projective transformation is a linear transformation that warps an images with 8 degrees of freedom. We accomplish this with a 3x3 homography matrix H. </p>
+            <div class="one-column">
+                <figure>
+                    <img src="data/homography.jpg">
+                    <figcaption><a href='https://inst.eecs.berkeley.edu/~cs194-26/fa20/Lectures/mosaic.pdf#page=11'>source</a></figcaption>
+                </figure>
+            </div>
+            <p>We say it has 8 DOF because when constructing it, we can freeze the bottom right value to be 1, so there are only 8 values of the 9 in the matrix to be determined. We solved for these remaining values be setting up a system of equations. In the equation, p and p' are points, where each is defined by p=(x, y, 1), p'=(wx', wy', w1) where x and y are coordinates in the original image and x' and y' are coordinates in the transformed image. We technically only need 4 pairs of points to solve for this matrix, but we use more to make our solution more stable since it's very sensitive to small pertubations in pixel values. Thus we solve with least squares, then when we want to transform a point (x, y), we append a 1, multiply by H, then divide by the scaling value w to normalize and discover x', y'. </p>
+            
+            <p>In reality, I actually use the inverse of this matrix, H^{-1}, since I end up using inverse warping to reconstruct the transformed image from pixels in the original image.</p>
+            
+        </div>
+        <h2>Image rectification</h2>
+        <div class="1.2">
+            <p>Image rectification is essentially the process of transforming an image so that a particular plane in focus is warped, acting as a shift in point of view. In these cases, we want to select 4 points in the original image that we know form a rectangle in reality (but which don't initially form a rectangle in the image due to the angle) and warp them in such a way that they do, making the plane "frontal-parallel".</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/labeled_poster.jpg">
+                        <figcaption>original image of poster from angle</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/rectified_poster_border.jpg">
+                        <figcaption>rectified poster mapping to output that leaves 500px on each side</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/rectified_poster.jpg">
+                        <figcaption>rectified poster mapping to output that stretches poster to fill image</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_1.jpg">
+                        <figcaption>original image of shed from the front</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/rectified_shed_1_correct.jpg">
+                        <figcaption>rectified image of shed warped so side is frontal-parallel</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+        <h2>Image mosaics</h2>
+        <div class="1.3">
+            <p>Finally, I use the homographies to "mosaic" images together. This involves taking 2 images of the same scene, but from a different angle, or staying in the same location and taking 2 images with overlap in the scene. The next step is then manually selecting common landmarks in both images. I then use these common landmarks to compute my homography matrix H that warps one into the perspective of the other. The last step is finding a way to make the blend cleaner, instead of naively just adding the two together (which produces very obvious edge artifacts in the image). I experimented with a couple different ideas, such as trying to use masks and weighting the alpha of an overlapped pixel by distance to center of image. In the end, I found that simply taking the maximum of two pixel values that overlap produced decent results.</p>
+            <p>Below, I show the 3 mosaics and their respective source images.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_0.jpg">
+                        <figcaption>shed_0</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_1.jpg">
+                        <figcaption>shed_1</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/shed_mosaic.png">
+                        <figcaption>shed_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/computer_0.jpg">
+                        <figcaption>computer_0</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/computer_1.jpg">
+                        <figcaption>computer_1</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/computer_mosaic.png">
+                        <figcaption>computer_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/intersection_0_cropped.png">
+                        <figcaption>intersection_0</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/intersection_1_cropped.png">
+                        <figcaption>intersection_1</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/intersection_mosaic.png">
+                        <figcaption>intersection_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+        <h2>What I learned</h2>
+        <p>I was pleasantly surprised by how well the homography transformation worked. The most important part for me was figuring out how to set up the matrix equations to solve for the homography matrix H given common landmarks. Experimentally I also found it was very very important to have more than the minumum points to solve the least squares, as having more greatly improved results.</p>
+    </div>
+</body>
+</html>
