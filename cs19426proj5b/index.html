@@ -1,0 +1,479 @@
+<!doctype html>
+<html>
+<head>
+    <title>Brian Wu - CS 194-26 Project 5a</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="everything">
+        <div class="title">
+            <h1>CS 194-26 Fall 2020</h1> 
+            <h2>Project 5: (Auto)Stitching Photo Mosaics</h2> 
+            <h5>Brian Wu</h5>
+        </div>
+        <h3>Table of Contents</h3>
+        <ol>
+            <li><a href="#PartA">Part A: IMAGE WARPING and MOSAICING</a></li>
+            <li><a href="#PartB">Part B: FEATURE MATCHING for AUTOSTITCHING</a></li>
+        </ol>
+
+        <h1><a name="PartA">Part A: IMAGE WARPING and MOSAICING</a></h1> 
+        
+
+        <h2>Introduction</h2>
+        <p>In this project I take pictures and perform homographies on them to warp them. These projective transformations allow me to accomplish rectification and morphing of images into a mosaic.</p>
+
+        <h2>Shooting pictures</h2>
+        <div class="1.0">
+            <p>Source images I shot for this project.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_0.jpg">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_1.jpg">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/computer_0.jpg">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/computer_1.jpg">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/intersection_0.jpg">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/intersection_1.jpg">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+        <h2>Recover homographies</h2>
+        <div class="1.1">
+            <p>A projective transformation is a linear transformation that warps an images with 8 degrees of freedom. We accomplish this with a 3x3 homography matrix H. </p>
+            <div class="one-column">
+                <figure>
+                    <img src="data/homography.jpg">
+                    <figcaption><a href='https://inst.eecs.berkeley.edu/~cs194-26/fa20/Lectures/mosaic.pdf#page=11'>source</a></figcaption>
+                </figure>
+            </div>
+            <p>We say it has 8 DOF because when constructing it, we can freeze the bottom right value to be 1, so there are only 8 values of the 9 in the matrix to be determined. We solved for these remaining values be setting up a system of equations. In the equation, p and p' are points, where each is defined by p=(x, y, 1), p'=(wx', wy', w1) where x and y are coordinates in the original image and x' and y' are coordinates in the transformed image. We technically only need 4 pairs of points to solve for this matrix, but we use more to make our solution more stable since it's very sensitive to small pertubations in pixel values. Thus we solve with least squares, then when we want to transform a point (x, y), we append a 1, multiply by H, then divide by the scaling value w to normalize and discover x', y'. </p>
+            
+            <p>In reality, I actually use the inverse of this matrix, H^{-1}, since I end up using inverse warping to reconstruct the transformed image from pixels in the original image.</p>
+            
+        </div>
+        <h2>Image rectification</h2>
+        <div class="1.2">
+            <p>Image rectification is essentially the process of transforming an image so that a particular plane in focus is warped, acting as a shift in point of view. In these cases, we want to select 4 points in the original image that we know form a rectangle in reality (but which don't initially form a rectangle in the image due to the angle) and warp them in such a way that they do, making the plane "frontal-parallel".</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/labeled_poster.jpg">
+                        <figcaption>original image of poster from angle</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/rectified_poster_border.jpg">
+                        <figcaption>rectified poster mapping to output that leaves 500px on each side</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/rectified_poster.jpg">
+                        <figcaption>rectified poster mapping to output that stretches poster to fill image</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_1.jpg">
+                        <figcaption>original image of shed from the front</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/rectified_shed_1_correct.jpg">
+                        <figcaption>rectified image of shed warped so side is frontal-parallel</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+        <h2>Image mosaics</h2>
+        <div class="1.3">
+            <p>Finally, I use the homographies to "mosaic" images together. This involves taking 2 images of the same scene, but from a different angle, or staying in the same location and taking 2 images with overlap in the scene. The next step is then manually selecting common landmarks in both images. I then use these common landmarks to compute my homography matrix H that warps one into the perspective of the other. The last step is finding a way to make the blend cleaner, instead of naively just adding the two together (which produces very obvious edge artifacts in the image). I experimented with a couple different ideas, such as trying to use masks and weighting the alpha of an overlapped pixel by distance to center of image. In the end, I found that simply taking the maximum of two pixel values that overlap produced decent results.</p>
+            <p>Below, I show the 3 mosaics and their respective source images.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_0.jpg">
+                        <figcaption>shed_0</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/shed_1.jpg">
+                        <figcaption>shed_1</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/shed_mosaic.png">
+                        <figcaption>shed_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/computer_0.jpg">
+                        <figcaption>computer_0</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/computer_1.jpg">
+                        <figcaption>computer_1</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/computer_mosaic.png">
+                        <figcaption>computer_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="data/intersection_0_cropped.png">
+                        <figcaption>intersection_0</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="data/intersection_1_cropped.png">
+                        <figcaption>intersection_1</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/intersection_mosaic.png">
+                        <figcaption>intersection_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+        <h2>What I learned</h2>
+        <p>The most important part for me was figuring out how to set up the matrix equations to solve for the homography matrix H given the common landmarks. Experimentally I also learned it was very very important to have more than the minumum points to solve the least squares, as having more greatly improved results.</p>
+
+        <h1><a name="PartB">Part B: FEATURE MATCHING for AUTOSTITCHING</a></h1> 
+
+        <h2>Introduction</h2>
+        <p>For this part of the project, I aim to use algorithms to automate the feature matching and stitching process so I don't have to manually select corresponding landmarks. The overall idea is to start with a large set of candidate points, and narrow them down at each step, then performing a homography on the final set. Much of the work I do here follows ideas from the paper <a href='https://inst.eecs.berkeley.edu/~cs194-26/fa20/hw/proj5/Papers/MOPS.pdf'>“Multi-Image Matching using Multi-Scale Oriented Patches”</a> by Brown et al.</p>
+
+        <div class="row">
+            <div class="one-column">
+                <figure>
+                    <img src="output/legend.jpg">
+                    <figcaption>The following point plots are color-coded by this legend.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <h2>Harris Corner Features</h2>
+        <div class="2.0">
+            <p>First, we extract a broad set of corner features with the Harris Interest Point Detector. This algorithm essentially looks for points where shifts in a small patch lead to great changes in image values. Of course, this rough criteria allows many points which don't look like corners to be labeled as corners. Additionally, since this can generate an absurd amount of points that makes later steps very slow, I also tune the minimum distance between points and a threshhold for the Harris response values.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_0_harris.png">
+                        <figcaption>shed_0_harris</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_1_harris.png">
+                        <figcaption>shed_1_harris</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_0_harris.png">
+                        <figcaption>intersection_0_harris</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_1_harris.png">
+                        <figcaption>intersection_1_harris</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_0_harris.png">
+                        <figcaption>canyon_0_harris</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_1_harris.png">
+                        <figcaption>canyon_1_harris</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>Adaptive Non-Maximal Suppression</h2>
+        <div class="2.1">
+            <p>Of course, since Harris will produce far to many points, we want a way to select a good subset. Selecting just the top x values from Harris will not produce good results, since a lot of the points will be close to each other. To acheive a greater spread in the chosen subset, we use Adaptive Non-Maximal Suppression (ANMS). </p>
+            <div class="one-column">
+                <figure>
+                    <img src="data/anms_equation.jpg">
+                    <figcaption><a href='https://inst.eecs.berkeley.edu/~cs194-26/fa20/hw/proj5/Papers/MOPS.pdf#page=2'>source</a></figcaption>
+                </figure>
+            </div>
+            <p>This algorithm builds up a list of "interest points" which satisfy the condition that, up to some robustness constant c_robust, we want to only take points with the largest minimum suppression radius r_i given in the equation. Intuitively, we take points with large corner strength, but which are not too close to other points with large corner points, so among a group of such strong points within very near distance, only a few may actually be chosen. This leads to a better spread of interest points. Here I set c_robust=0.9 as in the original paper and set interest points to 500.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_0_anms.png">
+                        <figcaption>shed_0_anms</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_1_anms.png">
+                        <figcaption>shed_1_anms</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_0_anms.png">
+                        <figcaption>intersection_0_anms</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_1_anms.png">
+                        <figcaption>intersection_1_anms</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_0_anms.png">
+                        <figcaption>canyon_0_anms</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_1_anms.png">
+                        <figcaption>canyon_1_anms</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>Extracting Feature Descriptors</h2>
+        <div class="2.2">
+            <p>Now that we have a smaller set of interest points to work with, we want a way to compare one point in one image to another point in the other image. To accomplish this matching, we compute "feature descriptors", which are sections of the image centered at each point. More concretely, for each interest point in each image, I look at an axis-aligned 40x40 patch of the image centered at the interest point, downscale it to 8x8, then normalize it to have a mean of 0 and standard deviation of 1. The following is a sample of these feature descriptors.</p>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="output/feature_descriptor.png">
+                        <figcaption>feature_descriptor</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>Matching Feature Descriptors</h2>
+        <div class="2.3">
+            <p>With a set of feature descriptors corresponding to the interest points for each image, we can now proceed to try to "match" them across the images to find common landmarks. There are many ways to do this. Following the original paper, I look at each interest point in one image, and compare the distance (the sum of squared error between the two vectors) between its feature descriptor and the feature descriptor of every interest point in the other image. Then I look at the ratio between the smallest distance and 2nd-to-smallest distance (essentially nearest neighbors, looking at the 1-NN and 2-NN). If this ratio is small enough (below a threshhold, e.g. 0.3), I denote this as a feature match. Intuitively, I hope that if two points are corresponding, then not only are they close in feature descriptors, but they are much closer together than to the feature descriptors of other non-corresponding points. </p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_0_featurematch.png">
+                        <figcaption>shed_0_featurematch</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_1_featurematch.png">
+                        <figcaption>shed_1_featurematch</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_0_featurematch.png">
+                        <figcaption>intersection_0_featurematch</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_1_featurematch.png">
+                        <figcaption>intersection_1_featurematch</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_0_featurematch.png">
+                        <figcaption>canyon_0_featurematch</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_1_featurematch.png">
+                        <figcaption>canyon_1_featurematch</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>RANSAC</h2>
+        <div class="2.4">
+            <p>Despite our best efforts, even this feature matching will produce some bad matches. Our final step, before the homography, will be to perform Random Sample Consensus (RANSAC). This is an iterative algorithm that, at each iteration, will randomly sample 4 of the pairs of feature matched points. With these 4 pairs of points, we can compute a homography matrix H (as described in Part A). While we don't have an overdetermined system here for least squared, we can still solve for H with exactly 4 pairs of points. And with this H, we can apply H to each of the feature-matched point in one image to transform it, then compare the distance between this transformed point H*p and it's corresponding feature-matched point in the other image p'. If this distance is small enough (e.g. less than some epsilon=2) we consider this an "inlier", or a point that agrees with the homography matrix H generated by our sampled points. We run this algorithm for many iterations (I chose 100), then keep the result that produced the largest number of inliers. Finally, we take this set of inliers (hopefully more than 4 points) and compute a final homography matrix H using least-sqaures, which should give an even more accurate H.</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_0_ransac.png">
+                        <figcaption>shed_0_ransac</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/shed_1_ransac.png">
+                        <figcaption>shed_1_ransac</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_0_ransac.png">
+                        <figcaption>intersection_0_ransac</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/intersection_1_ransac.png">
+                        <figcaption>intersection_1_ransac</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_0_ransac.png">
+                        <figcaption>canyon_0_ransac</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/points/canyon_1_ransac.png">
+                        <figcaption>canyon_1_ransac</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <h2>Mosaics</h2>
+        <div class="2.5">
+            <p>Finally, we can use the same mosaicing algorithm from Part A to use the homography computed by the RANSAC points to warp and stitch together our images into a mosaic. I compare the mosaics generated by hand-labeled landmarks with those generated by the RANSAC points. I also made a change to the blending method, where I use the distance transform (distance to closest edge) of a point as its weight instead of just taking max of two image at an overlapping pixel, and I made the background white (255) instead of black (0).</p>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/mosaics/manual_shed_mosaic.png">
+                        <figcaption>manual shed_mosaic</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/mosaics/shed_mosaic.png">
+                        <figcaption>autostiched shed_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/mosaics/manual_intersection_mosaic.png">
+                        <figcaption>manual intersection_mosaic</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/mosaics/intersection_mosaic.png">
+                        <figcaption>autostiched intersection_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <div class="row">
+                <div class="two-column">
+                    <figure>
+                        <img src="output/mosaics/manual_canyon_mosaic.png">
+                        <figcaption>manual canyon_mosaic</figcaption>
+                    </figure>
+                </div>
+                <div class="two-column">
+                    <figure>
+                        <img src="output/mosaics/canyon_mosaic.png">
+                        <figcaption>autostiched canyon_mosaic</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>For the shed and intersection images, the differences between the manually labelled and autostiched mosaics was not too noticable, but I think the autostiched ones looked slightly better. For the canyon image, it was extremely hard to manually find good corner points that stood out (beyond a few on the canyon ridges), so the manual result was not great, but the autostiched version did an great job of finding corresponding points which resulted in a much nicer mosaic.</p>
+        </div>
+
+
+        <h2>What I learned</h2>
+        <p>Something really cool I noticed was that the algorithms found corners and matches which most humans would not really consider easy matches, yet still did a great job at stitching the images. For example, in the shed images, I manually selected a lot of distinct features like corners of doors and windows and buildings. But the Harris detector and subsequent subsets ended up detecting matching features between a lot of points on the ground, which were still technically corresponding between the two images, but probably a lot harder for a human to figure out. Similarly, I struggled to find good points on the canyon images, but the algorithms detected a lot of corresponding points on the canyon wall that I couldn't match, which I thought was neat.</p>
+        
+        
+
+    </div>
+</body>
+</html>
