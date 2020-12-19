@@ -1,0 +1,407 @@
+<!doctype html>
+<html>
+<head>
+    <title>Brian Wu - CS 194-26 Final Project</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="everything">
+        <div class="title">
+            <h1>CS 194-26 Fall 2020 Final Project</h1> 
+            <h2>Brian Wu</h2>
+        </div>
+
+        <h3>Table of Contents</h3>
+        <ol>
+            <li><a href="#Project1">Project 1: Nerual Style Transfer</a></li>
+            <li><a href="#Project2">Project 2: Lightfield Camera</a></li>
+        </ol>
+        
+        <h1><a name="Project1">Project 1: Nerual Style Transfer</a></h1>
+
+        <div class="1.1">
+            <h2>Introduction</h2>
+                <p>In this project, I will be conducting artistic style transfer: essentially transfering the style of one image into the content of another image. In particular, I implement <a href="https://arxiv.org/pdf/1508.06576.pdf">"A Neural Algorithm of Artistic Style"</a>. I also referenced the more formal paper <a href="https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf">"Image Style Transfer Using Convolutional Neural Networks"</a> by the same authors, which describes the process and methodology in more detail. Much of my work here draws upon these sources.</p>
+        </div>
+        <div class="1.2">
+            <h2>Methodology</h2>
+                <p>As described in the papers, the idea is to leverage the features of a neural network to iteratively construct an image which fits the content of one input while fitting the style of another input. More concretely, we will be running gradient descent to minimize a loss function, but instead of taking gradients with respect to the weights of a model (as we do when training the model for inference) we take the gradients with respect to the input. Furthermore, the loss here is comprised of our two objectives: if we let L_content represent content loss and L_style represent style loss (more detail on these later), our total loss L_total will be some weighted combination of the two, as described in the paper:</p>
+                <div class="row">
+                    <div class="one-column">
+                        <figure>
+                            <img src="style_transfer/data/assets/total_loss_equation.jpg">
+                            <figcaption>total_loss_equation</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                Here, <em>x</em> is the input we optimize, <em>p</em> is the original content image, and <em>a</em> is the original style image. The values of alpha and beta represent how we are weighting the importance of matching content vs matching style. For instance, a relatively higher alpha and lower beta would mean content loss has greater impact on total loss, so we care more about minimizing content loss and our resulting <em>x</em> will end up retaining much of the content from the content image without as much of the style from the style image. Of course, the actual values of alpha and beta don't matter. What matters is their ratio, alpha/beta, which we can tune to vary the tradeoff between the two.
+
+                <h3>Content Loss</h3>
+                <p>We represent content loss L_content between x and p at a particular layer <em>l</em> as the SSD of the difference between the flattened feature maps of x (F_l) and p (P_l) at that layer.</p>
+                <div class="row">
+                    <div class="one-column">
+                        <figure>
+                            <img src="style_transfer/data/assets/content_loss_equation.jpg">
+                            <figcaption>content_loss_equation</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                <p>Intuitively, we say the content loss between two images is lower when their activations at a particular layer look similar.</p>
+
+                <h3>Style Loss</h3>
+                <p>The style loss is a bit more complicated. How can we construct a loss to capture the similarity in "style" of two images? According to the paper, we can compute something known as a Gram matrix G at each layer l, which in each entry G_ij contains the "inner product between vectorised feature maps i and j at layer l". This essentially captures the correlations between features, where features that occur together will generate higher values in G. Then we can run our style image and input x through the network, calculating the Gram matrix at certain layers, and calculate a weighted sum of the SSD between the Gram matrices at these layers to get an expression for L_style. This entire process is summarized by the following diagram:</p>
+                <div class="row">
+                    <div class="one-column">
+                        <figure>
+                            <img src="style_transfer/data/assets/style_transfer_process.jpg">
+                            <figcaption>style_transfer_process</figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <h3>My Model</h3>
+                <p>Following the paper, I used a pretrained VGG19 model to compute the losses (they used the same model). For reference, the following is the architecture of my model:</p>
+
+                <pre>
+                 Sequential(
+                    (0): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (1): ReLU(inplace=True)
+                    (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (3): ReLU(inplace=True)
+                    (4): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+
+
+                    (5): Conv2d(64, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (6): ReLU(inplace=True)
+                    (7): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (8): ReLU(inplace=True)
+                    (9): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+
+
+                    (10): Conv2d(128, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (11): ReLU(inplace=True)
+                    (12): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (13): ReLU(inplace=True)
+                    (14): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (15): ReLU(inplace=True)
+                    (16): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (17): ReLU(inplace=True)
+                    (18): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+
+
+                    (19): Conv2d(256, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (20): ReLU(inplace=True)
+                    (21): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (22): ReLU(inplace=True)
+                    (23): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (24): ReLU(inplace=True)
+                    (25): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (26): ReLU(inplace=True)
+                    (27): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+
+                    
+                    (28): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (29): ReLU(inplace=True)
+                    (30): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (31): ReLU(inplace=True)
+                    (32): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (33): ReLU(inplace=True)
+                    (34): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+                    (35): ReLU(inplace=True)
+                    (36): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+                    )
+                </pre>
+
+                <p>In terms of implementation, I mostly followed the paper. I initially used Adam for the optimizer but found that when I used LBFGS, which is what the original paper used, I got better results. I trained for 250 epochs, with a learning rate scheduler that starts at lr=0.9 but shrinks to lr=0.3. I also experimentated with initializing with noise versus initializing with the content image. As expected, initializing with content image tended to produce a result that more closely represented the content image (which was reported in the paper in Section 3.3), so I decided to stick with using the content image as initialization. Another thing I found that changed results a lot were the choice and weights of the style and content layers. As was found in the paper, I also found that choosing a content layer higher up in the model architecture usually produced better results, so I chose layer 25 as the content layer. For the style layers, I found that either choosing the first 5 convolutional layers (0, 2, 5, 7, 10), or choosing the 5 convolutional layers at the beginning of each block (0, 5, 10, 19, 28) worked the best.</p>
+                
+        </div>
+
+        <div class="1.3">
+            <h2>Results</h2>
+                
+            <h3>Images from Paper</h3> 
+            <p>Here I test my implementation on content and style images used in the original paper.</p>
+                
+                <div class="row">
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/tubingen.jpg">
+                            <figcaption>Content Image: Neckarfront </figcaption>
+                        </figure>
+                    </div> 
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/the_scream.jpg">
+                            <figcaption>Style Image: The Scream</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/output/tubingen-scream.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                <!-- <div class="row">
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/tubingen.jpg">
+                            <figcaption>Content Image: Neckarfront </figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/composition_vii.jpg">
+                            <figcaption>Style Image: Composition VII</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/output/tubingen-composition.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div> -->
+                <div class="row">
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/tubingen.jpg">
+                            <figcaption>Content Image: Neckarfront </figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/shipwreck.jpg">
+                            <figcaption>Style Image: The Shipwreck of the Minotaur</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/output/tubingen-shipwreck.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/tubingen.jpg">
+                            <figcaption>Content Image: Neckarfront </figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/nude.jpg">
+                            <figcaption>Style Image: Femme nue assise</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/output/tubingen-nude.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                
+                <p>Overall, I think the style transfer replication was pretty good. However, they were not quite as vibrant as in the paper (I think the colors are a bit more dull), likely because although I used the same model, there are a lot of different hyperparameters to tune (e.g. optimizer, learning rates, content layer, image sizes, etc.) that produce drastically different results even during my own experimentation.</p>
+
+                <h3>Custom Images</h3> 
+                <p>I also had some fun testing on images not from the paper.</p>
+                <div class="row">
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/glade.jpg">
+                            <figcaption>Content Image: Memorial Glade </figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/starry_night.jpg">
+                            <figcaption>Style Image: Starry Night</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/output/glade-starry_night.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/queen.jpg">
+                            <figcaption>Content Image: Queen's Gambit show</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/muse.jpg">
+                            <figcaption>Style Image: Muse</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/output/queen-muse.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="two-column">
+                        <figure>
+                            <img src="style_transfer/data/berkeley.jpg">
+                            <figcaption>Content Image: UC Berkeley </figcaption>
+                        </figure>
+                    </div>
+                    <div class="two-column">
+                        <figure>
+                            <img src="style_transfer/data/wave.jpg">
+                            <figcaption>Style Image: The Great Wave off Kanagawa</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="one-column">
+                        <figure>
+                            <img src="style_transfer/output/berkeley-wave.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <h3>Failure Case</h3>
+                <div class="row">
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/queen.jpg">
+                            <figcaption>Content Image: Queen's Gambit show</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/data/gambit.jpg">
+                            <figcaption>Style Image: Queen's Gambit chess opening</figcaption>
+                        </figure>
+                    </div>
+                    <div class="three-column">
+                        <figure>
+                            <img src="style_transfer/output/queen-gambit.png">
+                            <figcaption>Style Transfer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                <p>While I think the colors actually translated over pretty well, the style of the chess board was not at all transfered. I think in this case theres actually not enough information from the style image for the style (grid-like structure) to be preserved. Additionally, the appearance of a chess board is so different from the appearance of the real world that it seems very difficult to transfer much without sacrificing a lot of content (even here it's already clear that much of the details on the content image have been erased). </p>
+        </div>
+
+        <div class="1.4">
+            <h2>Summary</h2>
+            <p>This project was really interesting, the idea of using gradient descent to learn the input image instead of learning the weights of the model is a really cool idea, and a lot of the results were surprisingly good.</p>
+        </div>
+        
+        <h1><a name="Project2">Project 2: Lightfield Camera</a></h1>
+        <div class="2.1">
+            <h2>Introduction</h2>
+                <p>In this project, I will be using images from the Stanford Light Field Archive (essentially a grid of 17x17 cameras) to perform depth refocusing and aperture adjustment by varying how I combine the array of images in the datasets.</p>
+        </div>
+        <div class="2.2">
+            <h2>Depth Refocusing</h2>
+                <p>Across the different cameras, as the view moves, the objects in the background will move less than those in the foreground. Thus, when we average the images from all our views, the objects in the background will be sharper while the foreground will be blurrier.</p>
+                <div class="row">
+                    <div class="one-column">
+                        <figure>
+                            <img src="lightfield/output/chess/average.png">
+                            <figcaption>raw average</figcaption>
+                        </figure>
+                    </div>
+                </div>
+                <p>However, we can shift our images in such a way that we sharpen a different part of the scene instead, effectively refocusing the depth. The images from the dataset lie on a 17x17 grid, so I can shifted each image based on the position with respect to the center. I used both the actual camera position as well as the index of the camera, and found similar results, so I stuck with indices. Essentially, for a given image from camera at index (i, j), I take its offset from the center (8, 8) as (i - 8, j - 8), then scale it by some constant (I'll call it s) and shift the image by that amount and average all the resulting images. For s=0, we have the original image, but as s increases it has the effect of increasing the distance between views and shifting the depth focus.</p>
+                
+                <div class="row">
+                    <div class="one-column">
+                        <figure>
+                            <img src="lightfield/gifs/chess-0_3_02.gif">
+                            <figcaption>s in range [0, 3]</figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="one-column">
+                        <figure>
+                            <img src="lightfield/gifs/jelly--5_1_02.gif">
+                            <figcaption>s in range [-5, 1]</figcaption>
+                        </figure>
+                    </div>
+                </div>
+        </div>
+
+        <div class="2.3">
+            <h2>Aperture Adjustment</h2>
+            <p>Besides changing the depth focus, we can also average our images by only taking a subset of them instead of doing any shifting. More concretely, when we consider a grid of images centered around a main camera point, as we include more and more images surrounding the central image in our averaged result, we are effectively increasing the aperature as we use views from a larger range. With the grid of images in our dataset, we can play with the distance from center of an image we require to include in our average, from including all 17x17 images to including only the central 5x5, 3x3, and eventually only 1x1, a single image in the center.</p>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="lightfield/gifs/chess-aperture.gif">
+                        <figcaption>averaging all 17x17, 15x15, ... , 1x1</figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="lightfield/gifs/jelly-aperture.gif">
+                        <figcaption>averaging all 17x17, 15x15, ... , 1x1</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <div class="2.4">
+            <h2>Bells and Whistles: Using Real Data</h2>
+            <p>While it was nice to be able to use the grid of images from the Stanford Light Field Archive dataset, I wanted to try taking my own pictures with a camera to replicate the same effects. I took 25 images, in a 5x5 grid, of my keyboard.</p>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="lightfield/output/keyboard/keyboard_grid.png">
+                        <figcaption>5x5 grid of images, taken from slightly different positions by hand</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <h3>Depth Refocusing</h3>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="lightfield/gifs/keyboard--10_10_05.gif">
+                        <figcaption>s in range [-10, 10]</figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>I applied the same technique as in the previous portions. However, I found that no matter how I shifted, the averaged image would be blurry.</p>
+
+            <h3>Aperture Adjustment</h3>
+            <div class="row">
+                <div class="one-column">
+                    <figure>
+                        <img src="lightfield/gifs/keyboard-aperture.gif">
+                        <figcaption></figcaption>
+                    </figure>
+                </div>
+            </div>
+            <p>Aperture adjustment was also quite blurry, but while the results for the "larger" apertures were still blurry, it's pretty clear that the aperture is indeed looking like it's adjusting through the different images being included.</p>
+
+            <p>I think the primary reason my results were not great is because the images taken by hand did not correspond to a perfect grid. There may have been drastic non-uniformity in the positions. Additionally, I think for this particular scene the angle changes too much since the subject is too close, which means no matter how I average, the final result will be blurry because the keyboard cannot be aligned. Another potential issue is that I just didn't have the capacity to take enough photos, so while I took 25 for a 5x5 grid, the Stanford dataset had 289 images for a 17x17, allowing for much smaller distance between images while having a larger overall range of view.</p>
+        </div>
+
+        <div class="2.5">
+            <h2>Summary</h2>
+            <p>This project was really interesting. I appreciated how simple the algorithms were to acheive meaningful changes in aperature and depth focusing (largely due to how good the dataset is), and it was really cool to be able to effectively manipulate these properties long after the photos of the scenes have already been taken.</p>
+
+        </div>
+    </div>
+</body>
+</html>
